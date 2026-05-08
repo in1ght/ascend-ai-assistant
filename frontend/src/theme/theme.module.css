@@ -1,0 +1,35 @@
+.default {
+  --primary-color: #a097f7;
+  --speaker-color: #d8d7ff;
+  --text-color: #101010;
+  --bg-color: #fff ;
+  --white-color: #fffcfc;
+  --header-color: #ffffff4c;
+}
+
+.emotions {
+  --primary-color: #1f1f1f;
+  --speaker-color: #fbf8ff;
+  --text-color: #fffcfc;
+  --bg-color: #807382 ;
+  --white-color: #fffcfc;
+  --header-color: #1f1f1fcc;
+}
+
+.expert {
+  --primary-color: #c33a30;
+  --speaker-color: #ffeeee;
+  --text-color: #fffcfc;
+  --bg-color: #dd9797;
+  --white-color: #fffcfc;
+  --header-color: #c33a308a;
+}
+
+.conspiracies {
+  --primary-color: #a097f7;
+  --speaker-color: #f2eeff;
+  --text-color: #fffcfc;
+  --bg-color: #d8d7ff;
+  --white-color: #fffcfc;
+  --header-color: #a097f785;
+}
