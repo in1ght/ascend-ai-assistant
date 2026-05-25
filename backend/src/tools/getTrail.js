@@ -3,6 +3,7 @@ const { tool } = require("langchain");
 const { z } = require("zod");
 const axios = require("axios");
 const { pool } = require("../database/database.js");
+const { getUnsplashPhoto } = require("../services/unsplash.js");
 
 const getTrailFunction = async (input, userId) => {
     const filterMaps = {
@@ -40,7 +41,11 @@ const getTrailFunction = async (input, userId) => {
 
     try {
         const result = await dbClient.query(query);
-        return JSON.stringify(result.rows);;
+        const rows = await Promise.all(result.rows.map(async (trail) => ({
+            ...trail,
+            photo: await getUnsplashPhoto(`${trail.name} ${trail.location || ""} hiking trail`)
+        })));
+        return JSON.stringify(rows);
     } catch (err) {
         console.error(err);
         console.log("\n\n\nAn error occurred, servers are down, apologize to the user.\n\n\n");

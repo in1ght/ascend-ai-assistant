@@ -2,6 +2,7 @@ require('dotenv').config();
 const { tool } = require("langchain");
 const { z } = require("zod");
 const axios = require("axios");
+const { getUnsplashPhoto } = require("../services/unsplash.js");
 
 const API_BASE = "http://api.weatherapi.com/v1"
 
@@ -90,9 +91,13 @@ const getWeatherFunction = async (input) => {
   console.log(`${API_BASE}/${call}.json`);
 
   
+  const photo = await getUnsplashPhoto(`${city} city landscape`);
+
   const weather =
   call === "current"
     ? {
+        city,
+        photo,
         type: call,
         temperature: data.current.temp_c,
         condition: data.current.condition.text,
@@ -104,6 +109,8 @@ const getWeatherFunction = async (input) => {
     : (() => {
         const dayData = data.forecast.forecastday[0].day;
         return {
+          city,
+          photo,
           type: call,
           max_temperature: dayData.maxtemp_c,
           min_temperature: dayData.mintemp_c,
@@ -119,7 +126,7 @@ const getWeatherFunction = async (input) => {
   
   console.log(weather);
 
-  return weather;
+  return JSON.stringify(weather);
 
 };
 

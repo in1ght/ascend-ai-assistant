@@ -1,0 +1,189 @@
+.answerSuggestions{
+  justify-content: flex-end;
+  align-items: center;
+  gap: 5px;
+}
+
+.answerSuggestionButton{
+  border: 2px solid #a097f7;
+  line-height: 1.5;
+  font-size: calc(16px * var(--text-size));
+  padding: 9px 14px;
+  border-radius: 10px;
+  font-weight: 500;
+  color: #a097f7;
+  opacity: 0.9;
+  margin-bottom: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.answerSuggestionButton:hover{
+  opacity: 1;
+}
+
+.helperRow{
+  justify-content: flex-start;
+  box-sizing: border-box;
+  padding: 0px 20px 0 25px;
+  margin: 4px 0px 8px 0;
+}
+
+.helperCard{
+  width: 100%;
+  background: #ffffff;
+  border: 3px solid #a097f7;
+  border-radius: 8px;
+  box-shadow: 0 0 12px -8px #42445a;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+  color: #101010;
+  position: relative;
+}
+
+.photoCard{
+  display: flex;
+  flex-direction: column;
+}
+
+.helperBody{
+  padding: 11px 13px;
+  flex: 1;
+  min-width: 0;
+}
+
+.helperLabel{
+  color: black;
+  opacity: 0.7;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  background: #00000015;
+  /* 3px solid  #a097f7*/
+  backdrop-filter: blur(10px);
+  border-radius: 5px;
+  text-align: center;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.helperTitle{
+  color: black;
+  font-size: 18px;
+  font-weight: 700;
+  opacity: 0.9;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
+.helperText{
+  color: black;
+  font-size: 14px;
+  line-height: 1.35;
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+.helperLink{
+  display: inline-flex;
+  margin-top: 8px;
+  color: black;
+  padding: 5px 10px;
+  background: #d8d7ff;
+  border-radius: 10px;
+  font-size: 14px;
+  text-decoration: none;
+  transition: 0.4s;
+  opacity: 0.9;
+}
+.helperLink:hover{
+  opacity: 1;
+}
+
+.helperStats{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 9px;
+}
+
+.helperStats span{
+  background: #f0f0f0;
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;
+  color: #304137;
+  font-size: 14px;
+  line-height: 1.2;
+  padding: 10px 15px;
+}
+
+.helperPhoto{
+  min-height: 158px;
+  min-width: 158px;
+  position: relative;
+  overflow: hidden;
+  padding: 4px;
+}
+
+.helperPhotoImage{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 5px;
+}
+
+.weatherIcon{
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  right: 8px;
+  bottom: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+}
+
+.photoCredit{
+  color: #777777;
+  font-size: 10px;
+  line-height: 1.2;
+  margin-top: 7px;
+}
+
+.photoCredit a{
+  color: inherit;
+}
+
+.weatherTemp{
+  color: #182d27;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  margin-top: 7px;
+}
+
+.calendarCard{
+  align-items: center;
+}
+
+.calendarIconWrapper{
+  margin: 10px 3px 10px 10px;
+  padding: 13px 13px 15px 13px;
+  border-radius: 15px;
+  background: #a197f722;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 9px;
+}
+.calendarIcon{
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  opacity: 0.85;
+}

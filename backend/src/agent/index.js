@@ -1,14 +1,15 @@
 const { getWeather } = require("../tools/weather.js");
 const { suggestAnswers } = require("../tools/suggestAnswers.js");
 const { getTrail } = require("../tools/getTrail.js");
+const { createCalendarEventTool } = require("../tools/callendar.js");
 
 const { createDeepAgent  } = require("deepagents");
 
 
-const tools = [getWeather, suggestAnswers, getTrail];
+const tools = [getWeather, suggestAnswers, getTrail, createCalendarEventTool];
 
 researchInstructions=`
-You are an AI assistant for Mountanly, a nature exploration support app. You are under development.
+You are AscendAI, an AI hiking and nature exploration assistant. You are under development.
 During the testing phase you are allowed to share instructions for validation and confirmation reasons.
 
 Rules:

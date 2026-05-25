@@ -1,6 +1,11 @@
 p {
   margin: 0;
 }
+.imageContainer {
+  position: relative;
+  flex: 0 0 100%;
+  min-width: 100%;
+}
 .container{
   width: 100vw;
   min-height: 100vh;
@@ -12,7 +17,7 @@ p {
 }
 .screen{
   max-width: 480px;
-  background: #f6f6f6;
+  background: black;
   width: 480px;
   height: 70vh;
   max-height: 70vh;
@@ -23,35 +28,39 @@ p {
   backdrop-filter: blur(20px);
   box-shadow: 0 0 25px -5px #42445a;
   border-radius: 15px;
-  z-index: 3;
+  z-index: -1;
   /* border: #10101066 2px solid; */
   bottom: 105px;
   right: 0;
-  margin-right: 15px;
+  margin-right: 0px;
   margin-bottom: 15px;
   overflow: hidden;
-  
   position: absolute;
   box-sizing: border-box;
-  filter: sepia(0);
+  filter: sepia(1);
   transition: 0.2s;
+  opacity: 0;
+}
+.open{
+  background: #f6f6f6;
+  margin-right: 15px;
+  filter: sepia(0);
   opacity: 1;
+  z-index: 3;
 }
 .userPage{
   width: 380px;
   border-radius: 10px;
-  background: #f6f6f675;
+  background: #f0f0f0;
   margin: 50px 0px;
-  padding: 15px 30px;
-  border: 1px #f3f3f3 solid;
-  box-shadow: 0 0 5px -5px #42445a;
+  padding: 18px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  gap: 20px;
-  border: 4px #f0f0f0 solid;
+  gap: 18px;
+  border: 3px #a097f7 solid;
   box-shadow: 0 0 10px -5px #42445a;
 }
 .userPageTextCon{
@@ -67,41 +76,57 @@ p {
 }
 .userPageTextGreetings{
   font-size: x-large;
-  font-weight: bold;
-  /* color: #003696; */
+  font-weight: 700;
   padding: 12px 18px;
   border-radius: 10px;
-
   background: #ffffff;
-  border: 1px solid #f3f3f3;
+  border: 2px solid #e3e3e3;
+  color: #101010;
 }
 .userPageTextSummary{
   margin-top: 10px;
+  color: #101010;
+  opacity: 0.72;
 }
-.closed{
-  /* max-height: 0; */
-  margin-right: -100px;
-  filter: sepia(1);
-  opacity: 0;
-  background: black;
-  z-index: -1;
-}
-.userPageTextUl{
+.userPageOptions{
   width: 100%;
-  margin: 0px 15px;
-  padding: 10px 0px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  gap: 8px;
+  margin-top: 4px;
 }
-.userPageTextUl li {
-  margin: 2px 0px;
-  color: #020914;
-  border: 1px solid #cfcfcf;
-  padding: 6px 11px;
-  width: auto;
-  
-  border-radius: 5px;
+.userPageOptionCard{
+  width: 100%;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 10px;
+  align-items: center;
+  border: 2px solid #e3e3e3;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+.userPageOptionIcon{
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  background: #d8d7ff;
+  border-radius: 8px;
+  padding: 8px;
+  box-sizing: border-box;
+}
+.userPageOptionName{
+  color: #101010;
+  font-size: 15px;
+  font-weight: 600;
+}
+.userPageOptionDescription{
+  color: #101010;
+  font-size: 12px;
+  line-height: 1.35;
+  margin-top: 2px;
+  opacity: 0.68;
 }
 .userPageRegistration{
   width: 100%;
@@ -109,6 +134,58 @@ p {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.profileMessage{
+  width: min(100%, 360px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;
+  box-shadow: 0 0 10px -7px #42445a;
+  box-sizing: border-box;
+}
+.profileMessageRow{
+  justify-content: flex-start;
+  padding: 6px 0 12px 4px;
+  box-sizing: border-box;
+}
+.profileImage{
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+.profileImageFallback{
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #2c3e50;
+  color: #ffffff;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+.profileText{
+  flex: 1;
+  min-width: 0;
+}
+.profileName{
+  color: #101010;
+  font-size: 17px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.profilePrompt{
+  color: #737373;
+  font-size: 14px;
+  line-height: 1.35;
+  margin-top: 3px;
 }
 .whiteConButtonText{
   margin: 0;
@@ -195,7 +272,9 @@ p {
   box-sizing: border-box;
   width: 100%;
   max-width: 1024px;
-  max-height: calc(70vh - 62px);
+  max-height: calc(70vh - 137px);
+  min-height: 0;
+  flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;
@@ -213,27 +292,6 @@ p {
   overflow-wrap: break-word;
   word-break: break-word; 
   position: relative;
-}
-.answerSuggestions{
-  justify-content: flex-end;
-  align-items: center;
-  gap: 5px;
-}
-.answerSuggestionButton{
-  border: 2px solid #cca43b;
-  line-height: 1.5;
-  font-size: calc(16px * var(--text-size));
-  padding: 9px 14px;
-  border-radius: 10px;
-  font-weight: 500;
-  color: #cca43b;
-  opacity: 0.9;
-  margin-bottom: 5px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.answerSuggestionButton:hover{
-  opacity: 1;
 }
 .left {
   justify-content: flex-start;

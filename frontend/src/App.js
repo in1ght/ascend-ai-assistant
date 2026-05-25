@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import styles from './app.module.css'; 
 import theme from "./theme/theme.module.css";
 import ImgBuilder from "./assets/ImgBuilder";
@@ -7,13 +8,50 @@ import ImgBuilder from "./assets/ImgBuilder";
 import ReactMarkdown from "react-markdown";
 import Loading from "./components/loading/loading";
 import GoogleButton from "./components/googleButton/googleButton";
-// import { GoogleLogin } from "@react-oauth/google";
-// import { googleLogout } from '@react-oauth/google'; // googleLogout();
+import HelperCard, { normalizeHelperMessage } from "./components/helperCards/helperCards";
+import AccountHeader from "./components/account/AccountHeader";
+import OptionalityOverlay from "./components/optionality/OptionalityOverlay";
+import LoggedOutOverlay from "./components/authNotice/LoggedOutOverlay";
+import ConfirmClearOverlay from "./components/confirmClear/ConfirmClearOverlay";
 
 const API_BASE = `http://localhost:5000`;
 
+const normalizeMessages = (items = []) => items
+  .filter(Boolean)
+  .map(normalizeHelperMessage);
+
+const getClientTimeZone = () => {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch (err) {
+    return null;
+  }
+};
+
+const welcomeOptions = [
+  {
+    name: "Suggestions",
+    description: "Quick answer choices when AscendAI needs a preference.",
+    icon: ImgBuilder.suggestion,
+  },
+  {
+    name: "Weather",
+    description: "Weather, wind, humidity and UV for a destination.",
+    icon: ImgBuilder.weather,
+  },
+  {
+    name: "Hiking",
+    description: "Trail recommendations with key route details.",
+    icon: ImgBuilder.hiking,
+  },
+  {
+    name: "Calendar",
+    description: "Add hiking plans when you provide the time.",
+    icon: ImgBuilder.calendar,
+  },
+];
+
 function App() {
-  // sssssssssssssssssssssssssssssssssssssssss
   const textRef = useRef(null);
   const pos = useRef({ x: 0, y: 0 });
 
@@ -23,23 +61,19 @@ function App() {
 
   function handleMouseMove(e) {
     const rect = e.currentTarget.getBoundingClientRect();
-
-    // 🎯 center-based anchor
+    if (!textRef.current) return;
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
     const offsetX = e.clientX - rect.left - centerX;
     const offsetY = e.clientY - rect.top - centerY;
 
-    // 🧊 ultra soft follow (even less extreme than before)
     pos.current.x = lerp(pos.current.x, offsetX, 0.02);
     pos.current.y = lerp(pos.current.y, offsetY, 0.02);
 
-    // 🪶 very small movement
     const moveX = pos.current.x * 0.02;
     const moveY = pos.current.y * 0.02;
 
-    // 🔄 subtle rotation (tiny angle only)
     const rotateY = offsetX * 0.02;  // left/right tilt
     const rotateX = -offsetY * 0.02; // up/down tilt
 
@@ -49,22 +83,80 @@ function App() {
        rotateY(${rotateY}deg)`;
   }
 
-  //sss ssssssssssssssssssssssssssssssssssssssssssssssss   s
   const [messages, setMessages] = useState([]);
   const [messageUser, setMessageUser] = useState('');
-  const [themeName, setThemeName] = useState("default");
+  const [themeName] = useState("default");
   const [isWaiting, setIsWaiting] = useState(false);
   const chatEndRef = useRef(null);
   const preventDoubleApiCall = useRef(false);
-  const [token, setToken] = useState(null);
+  const [token, setTokenState] = useState(() => localStorage.getItem("mountlyn_id_token"));
+  const [calendarAccessToken, setCalendarAccessTokenState] = useState(() => localStorage.getItem("mountlyn_calendar_access_token"));
   const [openMessanger, setOpenMessanger] = useState(false);
+  const [isOptionalityOpen, setIsOptionalityOpen] = useState(false);
+  const [isLoggedOutNoticeOpen, setIsLoggedOutNoticeOpen] = useState(false);
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    pushMessage(messageUser);
-  };
+  const setToken = useCallback((nextToken) => {
+    setTokenState(nextToken);
+    if (nextToken) {
+      localStorage.setItem("mountlyn_id_token", nextToken);
+    } else {
+      localStorage.removeItem("mountlyn_id_token");
+    }
+  }, []);
 
-  const pushMessage  = async (content) => {
+  const setCalendarAccessToken = useCallback((nextToken) => {
+    setCalendarAccessTokenState(nextToken);
+    if (nextToken) {
+      localStorage.setItem("mountlyn_calendar_access_token", nextToken);
+    } else {
+      localStorage.removeItem("mountlyn_calendar_access_token");
+    }
+  }, []);
+
+  const userProfile = useMemo(() => {
+    if (!token) return null;
+
+    try {
+      return jwtDecode(token);
+    } catch (err) {
+      console.error("Could not decode user profile", err);
+      return null;
+    }
+  }, [token]);
+
+  const userInitials = useMemo(() => {
+    const name = userProfile?.name || "";
+    return name
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase() || "U";
+  }, [userProfile]);
+
+  const fetchMessages = useCallback(async () => {
+    if (!token){
+      console.log("Not registered");
+      return
+    }
+    try {
+      const res = await axios.get(`${API_BASE}/message`, {headers: {
+          Authorization: `Bearer ${token}`}
+      });
+      setMessages(normalizeMessages(res.data));
+    } catch (err) {
+      if (err.response?.status === 401) {
+        setToken(null);
+        setCalendarAccessToken(null);
+        setIsLoggedOutNoticeOpen(true);
+      }
+      console.error("Could not fetch messages", err);
+    }
+  }, [token, setToken, setCalendarAccessToken]);
+
+  const pushMessage = useCallback(async (content) => {
     if (preventDoubleApiCall.current || !token) return;
     try{
       setIsWaiting(true);
@@ -76,40 +168,63 @@ function App() {
           content: content
         },{
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
+            ...(calendarAccessToken ? { "X-Calendar-Access-Token": calendarAccessToken } : {}),
+            ...(getClientTimeZone() ? { "X-Client-Time-Zone": getClientTimeZone() } : {})
           }
         }
       );
 
-      const { assistant, suggestions } = data;
-      await setMessages(prev => [...prev, assistant, suggestions?.content?.length ?
-        { ...suggestions, content: JSON.parse(suggestions.content) } : null].filter(Boolean));
+      const newItems = data.items?.length
+        ? data.items
+        : [data.assistant, ...(data.helpers || []), data.suggestions].filter(Boolean);
+
+      setMessages(prev => [...prev, ...normalizeMessages(newItems)]);
     } catch (err) {
+      if (err.response?.status === 401) {
+        setToken(null);
+        setCalendarAccessToken(null);
+        setIsLoggedOutNoticeOpen(true);
+      }
       setMessageUser('ERROR');
     } finally {
       preventDoubleApiCall.current = false
       setIsWaiting(false)
     }
-  }
+  }, [token, calendarAccessToken, setToken, setCalendarAccessToken]);
+
+  const confirmClearCurrentChat = useCallback(async () => {
+    if (!token) return;
+
+    await axios.delete(`${API_BASE}/message`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setMessages([]);
+    setIsClearConfirmOpen(false);
+  }, [token]);
+
+  const logout = useCallback(() => {
+    setToken(null);
+    setCalendarAccessToken(null);
+    setMessages([]);
+    setMessageUser("");
+  }, [setToken, setCalendarAccessToken]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    pushMessage(messageUser);
+  };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, setMessages]);
+    console.log(messages);
+  }, [messages]);
 
   useEffect(() => {
     fetchMessages();
-  }, [token, setToken]);
-
-  const fetchMessages = async () => {
-    if (!token){
-      console.log("Not registered");
-      return
-    }
-    const res = await axios.get(`${API_BASE}/message`, {headers: {
-        Authorization: `Bearer ${token}`}
-    });
-    setMessages(res.data);
-  };
+  }, [fetchMessages]);
 
   const renderHistory = {
     1: (msg, idx) => (
@@ -124,7 +239,7 @@ function App() {
     2: (msg, idx) => (
       <div key={msg.id} className={`${styles.messageRow} ${styles.left}`}>
 
-        <img src={ImgBuilder.chatBotPic} className={styles.chatBotPic}/>
+        <img alt="" src={ImgBuilder.chatBotPic} className={styles.chatBotPic}/>
         <div className={styles.message}>
           <ReactMarkdown>
             {msg.content}
@@ -132,17 +247,7 @@ function App() {
         </div>
       </div>
     ),
-    3: (msg, idx) => (
-      <div key={msg.id} className={`${styles.messageRow} ${styles.answerSuggestions}`}>
-        {(msg.content).map((item, idx) => (
-          <div key={idx} className={styles.answerSuggestionButton} onClick={() => pushMessage(item)}> 
-            <ReactMarkdown>
-              {item}
-            </ReactMarkdown>
-          </div>
-        ))}
-      </div>
-    ),
+    3: (msg, idx) => <HelperCard key={msg.id || idx} msg={msg} onSuggestionSelect={pushMessage}/>,
     default: (msg, idx) => (
       <p key={idx} ><b>Error:</b> The type of message given is non-existent, the message is: {msg.content}</p>
     ),
@@ -152,49 +257,67 @@ function App() {
     <div className={`${theme[themeName]} ${styles.container}`}  onMouseMove={handleMouseMove}>
 
       <div className={styles.imageContainer}>
-        <img src={ImgBuilder.mountain} className={`${styles.imageBG} ${styles.imageBGz1}`} />
-        <img src={ImgBuilder.mountainPNG} className={`${styles.imageBG} ${styles.imageBGz2}`} />
-        <p ref={textRef} className={styles.bgText}> Mountlyn</p>
+        <img alt="" src={ImgBuilder.mountain} className={`${styles.imageBG} ${styles.imageBGz1}`} decoding="async"/>
+        <img alt="" src={ImgBuilder.mountainPNG} className={`${styles.imageBG} ${styles.imageBGz2}`} decoding="async"/>
+        <p ref={textRef} className={styles.bgText}> AscendAI</p>
       </div>
       
 
-      <div className={`${styles.screen} ${openMessanger ?  "" : styles.closed}`}> 
+      <div className={`${styles.screen} ${openMessanger ? styles.open : ""}`}> 
 
-        {messages.length < 1 &&
+        {!token && messages.length < 1 &&
         <div className={styles.userPage}>
           <div className={styles.userPageTextCon}>
             <p className={`${styles.userPageTextGreetings} ${styles.userPageText}`}>
               Hi There!
             </p>
             <p className={`${styles.userPageTextSummary} ${styles.userPageText}`}>
-              We are happy to see you in our application, this bot can do the following:
+              AscendAI can help with:
             </p>
-            <ul className={`${styles.userPageTextUl} ${styles.userPageText}`}>
-              <li>Change the Theme and Settings</li>
-              <li>Perform RAG search</li>
-              <li>Propose auto-filled choices</li>
-              <li>Tell the weather in a specific location</li>
-              <li>Propose the hike based on the input</li>
-              <li>Add events to the callendar</li>
-            </ul>
+            <div className={styles.userPageOptions}>
+              {welcomeOptions.map((option) => (
+                <div key={option.name} className={styles.userPageOptionCard}>
+                  <img alt="" src={option.icon} className={styles.userPageOptionIcon}/>
+                  <div>
+                    <p className={styles.userPageOptionName}>{option.name}</p>
+                    <p className={styles.userPageOptionDescription}>{option.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          {!token ?
-            <GoogleButton setToken={setToken}/> :
-            <p>HI, YOU ARE REGISTERED, WRITE A MESSAGE</p>
-          }
+          {!token && <GoogleButton setToken={setToken} setCalendarAccessToken={setCalendarAccessToken}/>}
           
         </div>
         }
         
         
+        {token &&
+          <AccountHeader
+            userProfile={userProfile}
+            userInitials={userInitials}
+            onClearChat={() => setIsClearConfirmOpen(true)}
+            onLogout={logout}
+            onOpenOptionality={() => setIsOptionalityOpen(true)}
+          />
+        }
+
         <div className={styles.chatContainer}>
           <div className={styles.chatWrapper}>
             {messages.map((msg, idx) => (
               (renderHistory[msg.speaker] || renderHistory.default)(msg, idx)
             ))}
             {isWaiting && <Loading />}
+            <div ref={chatEndRef} />
           </div>
         </div>
+        <OptionalityOverlay isOpen={isOptionalityOpen} onClose={() => setIsOptionalityOpen(false)}/>
+        <LoggedOutOverlay isOpen={isLoggedOutNoticeOpen} onClose={() => setIsLoggedOutNoticeOpen(false)}/>
+        <ConfirmClearOverlay
+          isOpen={isClearConfirmOpen}
+          onCancel={() => setIsClearConfirmOpen(false)}
+          onConfirm={confirmClearCurrentChat}
+        />
         
         <div className={styles.inputContainer}>
           <form className={styles.inputBox} onSubmit={handleSubmit} >
@@ -210,12 +333,12 @@ function App() {
 
       <footer className={styles.footer}>
         <div className={`${styles.iconOpenMessangerContainer} ${openMessanger ? styles.iconOpenMessangerContainerOpen : ''}`} onClick={() => setOpenMessanger(prev => !prev)}>
-          <img src={ImgBuilder.chatting} className={styles.iconOpenMessanger}/>
+          <img alt="Open messenger" src={ImgBuilder.chatting} className={styles.iconOpenMessanger}/>
         </div>
       </footer>
 
     </div>
   );
-  }
+}
 
 export default App;

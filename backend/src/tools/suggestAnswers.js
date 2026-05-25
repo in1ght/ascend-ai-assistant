@@ -3,7 +3,7 @@ const { z } = require("zod");
 
 const suggestAnswersFunc = async (input) => {
   console.log(input); 
-  return input.options;
+  return JSON.stringify(input.options);
 };
 
 const suggestAnswers = tool(

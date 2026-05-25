@@ -4,6 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "db:migrate": "node src/database/migrate.js",
+    "db-clear-messages": "node src/database/migrate.js --clear-messages",
+    "db-reset-messages-table": "node src/database/migrate.js --reset-messages-table",
+    "db-reset-trails-table": "node src/database/migrate.js --reset-trails-table",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

@@ -1,0 +1,74 @@
+.overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  background: rgba(0, 0, 0, 0.82);
+  animation: overlayIn 180ms ease forwards;
+  box-sizing: border-box;
+}
+
+.panel{
+  width: min(460px, 100%);
+  border-radius: 10px;
+  border: 3px solid #a097f7;
+  background: #f0f0f0;
+  box-shadow: 0 30px 70px -50px #101010;
+  padding: 26px 23px;
+  box-sizing: border-box;
+  animation: panelIn 220ms ease-out forwards;
+}
+
+.title{
+  color: #101010;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.text{
+  color: #101010;
+  font-size: 16px;
+  line-height: 1.45;
+  margin-top: 8px;
+  opacity: 0.68;
+}
+
+.actions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.primaryButton,
+.secondaryButton{
+  border-radius: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.primaryButton{
+  border: 0;
+  background: #a097f7;
+  color: #ffffff;
+}
+
+.secondaryButton{
+  background: #ffffff;
+  color: #101010;
+  border: 2px solid #e3e3e3;
+}
+
+@keyframes overlayIn{
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes panelIn{
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

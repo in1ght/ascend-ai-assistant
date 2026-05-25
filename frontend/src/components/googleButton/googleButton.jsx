@@ -5,7 +5,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import axios from 'axios';
 const API_BASE = `http://localhost:5000`;
 
-const GoogleButton = ({setToken}) => {
+const GoogleButton = ({setToken, setCalendarAccessToken}) => {
   const login = useGoogleLogin({
     flow: "auth-code",
     scope: "openid profile email https://www.googleapis.com/auth/calendar.app.created",
@@ -16,6 +16,7 @@ const GoogleButton = ({setToken}) => {
         });
 
         setToken(response.data.id_token);
+        setCalendarAccessToken(response.data.access_token);
       } catch (err) {
         console.error("Login error", err);
       }
@@ -25,7 +26,7 @@ const GoogleButton = ({setToken}) => {
   return (
     <button className={`${styles.iconOpenMessangerContainer} ${styles.whiteConButton}`} onClick={() => login()}>
 
-      <img src={ImgBuilder.googleIamge} className={`${styles.iconOpenMessanger} ${styles.whiteConButtonImage}`}/>
+      <img alt="" src={ImgBuilder.googleIamge} className={`${styles.iconOpenMessanger} ${styles.whiteConButtonImage}`}/>
       <div className={styles.whiteConButtonText}>
         Continue with Google.
       </div>
