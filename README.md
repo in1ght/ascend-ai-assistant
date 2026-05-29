@@ -1,15 +1,6 @@
 # AscendAi
 
-```
-    ___       ___       ___       ___       ___       ___            ___       ___   
-   /\  \     /\  \     /\  \     /\  \     /\__\     /\  \          /\  \     /\  \  
-  /::\  \   /::\  \   /::\  \   /::\  \   /:| _|_   /::\  \        /::\  \   _\:\  \ 
- /::\:\__\ /\:\:\__\ /:/\:\__\ /::\:\__\ /::|/\__\ /:/\:\__\      /::\:\__\ /\/::\__\
- \/\::/  / \:\:\/__/ \:\ \/__/ \:\:\/  / \/|::/  / \:\/:/  /      \/\::/  / \::/\/__/
-   /:/  /   \::/  /   \:\__\    \:\/  /    |:/  /   \::/  /         /:/  /   \:\__\  
-   \/__/     \/__/     \/__/     \/__/     \/__/     \/__/          \/__/     \/__/            
-```
-
+![all_optionality](readme_images/images/images_merged.png)
 
 AscendAi is an AI assistant designed to enhance one's hiking experience by providing tips, suggestions, information, and photos of specific locations. AscendAi can answer hiking questions, ask for missing preferences, recommend trails, check the weather, create Google Calendar events, and suggest answers.
 
@@ -86,8 +77,15 @@ The frontend runs on `http://localhost:3000` and expects the backend on `http://
 
 ## App overview
 
-![all_optionality](readme_images/images/images_merged.png)
-
+```
+    ___       ___       ___       ___       ___       ___            ___       ___   
+   /\  \     /\  \     /\  \     /\  \     /\__\     /\  \          /\  \     /\  \  
+  /::\  \   /::\  \   /::\  \   /::\  \   /:| _|_   /::\  \        /::\  \   _\:\  \ 
+ /::\:\__\ /\:\:\__\ /:/\:\__\ /::\:\__\ /::|/\__\ /:/\:\__\      /::\:\__\ /\/::\__\
+ \/\::/  / \:\:\/__/ \:\ \/__/ \:\:\/  / \/|::/  / \:\/:/  /      \/\::/  / \::/\/__/
+   /:/  /   \::/  /   \:\__\    \:\/  /    |:/  /   \::/  /         /:/  /   \:\__\  
+   \/__/     \/__/     \/__/     \/__/     \/__/     \/__/          \/__/     \/__/            
+```
 AscendAi uses a visual messenger interface. Users sign in with Google, chat with the assistant, and receive both normal text messages and structured helper cards. The UI is designed around hiking planning, with photo cards for places and trails, account controls, confirmation overlays, and fullscreen image previews.
 
 ### External services
