@@ -196,8 +196,13 @@ router.post('/',auth, async (req, res) => {
     
     const history = await client.query(
       `SELECT speaker, content, helper_name, helper_payload
-      FROM messages
-      WHERE user_id = $1
+      FROM (
+        SELECT speaker, content, helper_name, helper_payload, id
+        FROM messages
+        WHERE user_id = $1
+        ORDER BY id DESC
+        LIMIT 15
+      ) recent_messages
       ORDER BY id ASC`,
       [userId]
     );
